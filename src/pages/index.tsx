@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import styles from '@/styles/Home.module.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import Board from './components/board';'';
 
 export default function Home() {
 	return (
@@ -12,6 +13,8 @@ export default function Home() {
 				<link rel="icon" href="" />
 			</Head>
 			<main className={styles.main}>
+				<h2>Juego de la vida</h2>
+				<Board matrixSize={50}/>
 			</main>
 		</>
 	)

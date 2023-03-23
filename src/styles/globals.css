@@ -100,6 +100,19 @@ a {
   text-decoration: none;
 }
 
+.border {
+  width: 10px;
+  height: 10px;
+  border: solid #d2d2d2 1px;
+}
+
+td:hover {
+  background-color: #deb8874a;
+}
+.active {
+  background-color: burlywood;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
