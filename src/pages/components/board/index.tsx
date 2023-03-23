@@ -8,9 +8,31 @@ interface Props {
 const Board: React.FC<Props> = ({
 	matrixSize,
 }) => {
-	const [population, setPopulation] = useState<null | number>(0);
-	const [generation, setGeneration] = useState<null | number>(0);
-	const [populationList, setPopulationList] = useState<[]>([]);
+	const [population, setPopulation] = useState<number>(0);
+	const [generation, setGeneration] = useState<number>(0);
+	const [populationList, setPopulationList] = useState<string[]>([]);
+
+	const addRemovePopulation = (id: string) => {
+		let copyPopulationList = populationList;
+
+		if (populationList.includes(id)) {
+			copyPopulationList = copyPopulationList.filter(item => item != id);
+			setPopulation(population - 1);
+		} else {
+			copyPopulationList.push(id);
+			setPopulation(population + 1);
+		}
+		setPopulationList(copyPopulationList);
+	}
+
+	const isLife = (id: string) => {
+		if (populationList.includes(id)) {
+			return true;
+		}
+		return false;
+	}
+
+	console.log(populationList);
 
 	return (
 		<div>
@@ -27,7 +49,8 @@ const Board: React.FC<Props> = ({
 							<td
 								id={`td-${i}-${j}`}
 								key={`td-${i}-${j}`}
-								className={"border"}
+								className={`${isLife(`td-${i}-${j}`) && "active" } border`}
+								onClick={() => addRemovePopulation(`td-${i}-${j}`)}
 							/>
 						))}
 					</tr>
