@@ -1,27 +1,38 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 
-interface Props {
-	matrixSize: number;
-}
+import Controls from '../controls';
 
-const Board: React.FC<Props> = ({
-	matrixSize,
-}) => {
+const Game: React.FC = () => {
 	const [population, setPopulation] = useState<number>(0);
 	const [generation, setGeneration] = useState<number>(0);
 	const [populationList, setPopulationList] = useState<Array<String>>([]);
+	const [nextGenerationAutomatic, setNextGenerationAutomatic] = useState<Boolean>(false);
 
-	const addPopulation = (id: string, copy:Array<String>) => {
-		copy.push(id);
+	const matrixSize = 50;
+
+	const neighbors = (i:number, j:number) => [
+		`${i-1}-${j-1}`,
+		`${i-1}-${j}`,
+		`${i-1}-${j+1}`,
+		`${i}-${j-1}`,
+		`${i}-${j+1}`,
+		`${i+1}-${j-1}`,
+		`${i+1}-${j}`,
+		`${i+1}-${j+1}`,
+	];
+
+	const addPopulation = useCallback((id: string, copy:Array<String>) => {
 		setPopulation(population + 1);
+		copy.push(id);
 		return copy;
-	}
-	const RemovePopulation = (id: string, copy:Array<String>) => {
+	}, [population]);
+
+	const RemovePopulation = useCallback((id: string, copy:Array<String>) => {
 		copy = copy.filter(item => item != id);
 		setPopulation(population - 1);
 		return copy;
-	}
+	},[population]);
 
 	const newPopulationList = (id: string) => {
 		if (populationList.includes(id)) {
@@ -35,25 +46,14 @@ const Board: React.FC<Props> = ({
 		return populationList.includes(id);
 	}, [populationList]);
 
-	const neighbors = (i:number, j:number) => [
-		`${i-1}-${j-1}`,
-		`${i-1}-${j}`,
-		`${i-1}-${j+1}`,
-		`${i}-${j-1}`,
-		`${i}-${j+1}`,
-		`${i+1}-${j-1}`,
-		`${i+1}-${j}`,
-		`${i+1}-${j+1}`,
-	];
-
 	const totalNumberNeighbors = (i:number, j:number) => {
-		let cont = 0;
+		let counter = 0;
 		neighbors(i, j).map((item) => {
 			if(populationList.includes(item)) {
-				cont++;
+				counter++;
 			}
 		});
-		return cont;
+		return counter;
 	}
 
 	const nextGeneration = () => {
@@ -75,6 +75,7 @@ const Board: React.FC<Props> = ({
 			}
 		}
 		setGeneration(generation+1);
+		setPopulation(copyPopulationList.length);
 		setPopulationList(copyPopulationList);
 	};
 
@@ -82,37 +83,42 @@ const Board: React.FC<Props> = ({
 		setPopulationList([]);
 		setGeneration(0);
 		setPopulation(0);
+		setNextGenerationAutomatic(false);
 	}
 
+	const autoplay = () => setNextGenerationAutomatic(!nextGenerationAutomatic);
+
 	useEffect(() => {
-		
-	}, [populationList, generation]);
+		if(nextGenerationAutomatic) {
+			nextGeneration();
+		}
+	}, [populationList, nextGenerationAutomatic]);
 
 	return (
 		<div>
-			<div>
-				Población: {population}
+			<Controls
+				population={population}
+				generation={generation}
+				autoplay={autoplay}
+				nextGeneration={nextGeneration}
+				clear={clear}
+			/>
+			<div className="board">
+				<table>
+					{Array.from({ length: matrixSize }).map((_, i) => (
+						<tr key={`tr-${i}`}>
+							{Array.from({ length: matrixSize }).map((_, j) => (
+								<td
+									id={`${i}-${j}`}
+									key={`${i}-${j}`}
+									className={`${isLife(`${i}-${j}`) && "active" } border`}
+									onClick={() => newPopulationList(`${i}-${j}`)}
+								/>
+							))}
+						</tr>
+					))}
+				</table>
 			</div>
-			<div>
-				Generaciones: {generation}
-			</div>
-			<button onClick={nextGeneration}>Next Generation</button>
-			<button onClick={() => clear()}>Borrar</button>
-			<table>
-				<td><tr>h</tr></td>
-				{Array.from({ length: matrixSize }).map((_, i) => (
-					<tr key={`tr-${i}`}>
-						{Array.from({ length: matrixSize }).map((_, j) => (
-							<td
-								id={`${i}-${j}`}
-								key={`${i}-${j}`}
-								className={`${isLife(`${i}-${j}`) && "active" } border`}
-								onClick={() => newPopulationList(`${i}-${j}`)}
-							/>
-						))}
-					</tr>
-				))}
-			</table>
 		</div>
 	)};
-export default Board;
+export default Game;
