@@ -104,28 +104,39 @@ a {
   border: solid #d2d2d2 1px;
 }
 
-td {
+.size-cell{
   width: 10px;
   height: 10px;
 }
 
-td:hover {
+.size-cell:hover {
   background-color: #deb8874a;
 }
 
-.active {
-  background-color: burlywood;
+.div-board {
+  display: flex;
 }
 
 .board {
+  width: 100%;
   max-width: 100%;
   max-height: 95vh;
+}
+
+.container-board {
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .controls {
   position: sticky;
   width: 100%;
   top: 0;
+}
+.active {
+  background-color: burlywood;
 }
 
 @media (prefers-color-scheme: dark) {
