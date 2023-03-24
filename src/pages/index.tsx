@@ -14,7 +14,7 @@ export default function Home() {
 			</Head>
 			<main className={styles.main}>
 				<h2>Juego de la vida</h2>
-				<Board matrixSize={50}/>
+				<Board matrixSize={100}/>
 			</main>
 		</>
 	)
