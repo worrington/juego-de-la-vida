@@ -6,11 +6,10 @@ import Controls from '../controls';
 const Game: React.FC = () => {
 	const [population, setPopulation] = useState<number>(0);
 	const [generation, setGeneration] = useState<number>(0);
+	const [matrixSize, setMatrixSize] = useState<number>(100);
 	const [populationList, setPopulationList] = useState<Array<String>>([]);
 	const [nextGenerationAutomatic, setNextGenerationAutomatic] = useState<Boolean>(false);
 	const [border, setBorder] = useState<Boolean>(true);
-
-	const matrixSize = 100;
 
 	const neighbors = (i:number, j:number) => [
 		`${i-1}-${j-1}`,
@@ -47,17 +46,13 @@ const Game: React.FC = () => {
 		}
 	}
 
-	const totalNumberNeighbors = (i:number, j:number) => {
+	const totalNumberNeighbors = useCallback((i:number, j:number) => {
 		let counter = 0;
-		neighbors(i, j).map((item) => {
-			if (populationList.includes(item)) {
-				counter++;
-			}
-		});
+		neighbors(i, j).map((item) => populationList.includes(item) && counter++);
 		return counter;
-	}
+	}, [populationList]);
 
-	const nextGeneration = () => {
+	const nextGeneration = useCallback(() => {
 		let copyPopulationList = Array.from(populationList);
 		let neighbors = 0;
 		let id = "";
@@ -77,7 +72,7 @@ const Game: React.FC = () => {
 		setGeneration(generation+1);
 		setPopulation(copyPopulationList.length);
 		setPopulationList(copyPopulationList);
-	};
+	}, [RemovePopulation, addPopulation, generation, isLife, matrixSize, populationList, totalNumberNeighbors]);
 
 	const clear = () =>  {
 		setPopulationList([]);
@@ -94,7 +89,7 @@ const Game: React.FC = () => {
 		if (nextGenerationAutomatic) {
 			nextGeneration();
 		}
-	}, [populationList, nextGenerationAutomatic]);
+	}, [populationList, nextGenerationAutomatic, nextGeneration]);
 
 	return (
 		<div className="board">
@@ -108,25 +103,20 @@ const Game: React.FC = () => {
 				clear={clear}
 				whitBorder={whitBorder}
 			/>
-			<div>
-				<table>
-					<tr>
-						<td/>
-					</tr>
-					{matrixSize && Array.from({ length: matrixSize }).map((_, i) => (
-						<tr key={`tr-${i}`}>
-							{Array.from({ length: matrixSize }).map((_, j) => (
-								<td
-									id={`${i}-${j}`}
-									key={`${i}-${j}`}
-									className={`${isLife(`${i}-${j}`) && "active" } ${border && "border"}`}
-									onClick={() => newPopulationList(`${i}-${j}`)}
-								/>
-							))}
-						</tr>
-					))}
-				</table>
-			</div>
+			{matrixSize != 0 && <div className="container-board">
+				{Array.from({ length: matrixSize }).map((_, i) => (
+					<div key={`tr-${i}`} className="div-board">
+						{Array.from({ length: matrixSize }).map((_, j) => (
+							<div
+								id={`${i}-${j}`}
+								key={`${i}-${j}`}
+								className={`${isLife(`${i}-${j}`) && "active" } ${border && "border"} size-cell`}
+								onClick={() => newPopulationList(`${i}-${j}`)}
+							/>
+						))}
+					</div>
+				))}
+			</div>}
 		</div>
 	)};
 export default Game;

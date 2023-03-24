@@ -26,8 +26,8 @@ const Controls: React.FC<Props> = ({
 		<div className="controls container">
 			<div className="row">
 				<div className="col-sm">
-					<p>Población: {population}</p>
-					<p>Generaciones: {generation}</p>
+					<p>Population: {population}</p>
+					<p>Generation: {generation}</p>
 				</div>
 				<div className="col">
 					<button onClick={nextGeneration} className="btn btn-success m-1">
