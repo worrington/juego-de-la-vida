@@ -13,7 +13,6 @@ export default function Home() {
 				<link rel="icon" href="" />
 			</Head>
 			<main className={styles.main}>
-				<h3>Juego de la vida</h3>
 				<Game />
 			</main>
 		</>

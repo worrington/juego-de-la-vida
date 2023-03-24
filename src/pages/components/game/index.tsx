@@ -8,8 +8,9 @@ const Game: React.FC = () => {
 	const [generation, setGeneration] = useState<number>(0);
 	const [populationList, setPopulationList] = useState<Array<String>>([]);
 	const [nextGenerationAutomatic, setNextGenerationAutomatic] = useState<Boolean>(false);
+	const [border, setBorder] = useState<Boolean>(true);
 
-	const matrixSize = 50;
+	const matrixSize = 100;
 
 	const neighbors = (i:number, j:number) => [
 		`${i-1}-${j-1}`,
@@ -34,6 +35,10 @@ const Game: React.FC = () => {
 		return copy;
 	},[population]);
 
+	const isLife = useCallback((id: string) => {
+		return populationList.includes(id);
+	}, [populationList]);
+
 	const newPopulationList = (id: string) => {
 		if (populationList.includes(id)) {
 			setPopulationList(RemovePopulation(id, populationList));
@@ -42,14 +47,10 @@ const Game: React.FC = () => {
 		}
 	}
 
-	const isLife = useCallback((id: string) => {
-		return populationList.includes(id);
-	}, [populationList]);
-
 	const totalNumberNeighbors = (i:number, j:number) => {
 		let counter = 0;
 		neighbors(i, j).map((item) => {
-			if(populationList.includes(item)) {
+			if (populationList.includes(item)) {
 				counter++;
 			}
 		});
@@ -60,16 +61,15 @@ const Game: React.FC = () => {
 		let copyPopulationList = Array.from(populationList);
 		let neighbors = 0;
 		let id = "";
+
 		for (let i=0; i<=matrixSize-1; i++) {
 			for (let j=0; j<=matrixSize-1; j++){
 				neighbors = totalNumberNeighbors(i, j);
 				id = `${i}-${j}`;
-				if(isLife(id)){
-					if (neighbors < 2 || neighbors > 3 ) {
-						copyPopulationList = RemovePopulation(id, copyPopulationList);
-					}
+				if (isLife(id) && (neighbors < 2 || neighbors > 3 )) {
+					copyPopulationList = RemovePopulation(id, copyPopulationList);
 				}
-				if(!isLife(id) && neighbors === 3) {
+				if (!isLife(id) && neighbors === 3) {
 					copyPopulationList = addPopulation(id, copyPopulationList);
 				}
 			}
@@ -88,30 +88,38 @@ const Game: React.FC = () => {
 
 	const autoplay = () => setNextGenerationAutomatic(!nextGenerationAutomatic);
 
+	const whitBorder = () => setBorder(!border);
+
 	useEffect(() => {
-		if(nextGenerationAutomatic) {
+		if (nextGenerationAutomatic) {
 			nextGeneration();
 		}
 	}, [populationList, nextGenerationAutomatic]);
 
 	return (
-		<div>
+		<div className="board">
 			<Controls
 				population={population}
 				generation={generation}
+				nextGenerationAutomatic={nextGenerationAutomatic}
+				border={border}
 				autoplay={autoplay}
 				nextGeneration={nextGeneration}
 				clear={clear}
+				whitBorder={whitBorder}
 			/>
-			<div className="board">
+			<div>
 				<table>
-					{Array.from({ length: matrixSize }).map((_, i) => (
+					<tr>
+						<td/>
+					</tr>
+					{matrixSize && Array.from({ length: matrixSize }).map((_, i) => (
 						<tr key={`tr-${i}`}>
 							{Array.from({ length: matrixSize }).map((_, j) => (
 								<td
 									id={`${i}-${j}`}
 									key={`${i}-${j}`}
-									className={`${isLife(`${i}-${j}`) && "active" } border`}
+									className={`${isLife(`${i}-${j}`) && "active" } ${border && "border"}`}
 									onClick={() => newPopulationList(`${i}-${j}`)}
 								/>
 							))}
